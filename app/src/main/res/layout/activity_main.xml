@@ -11,41 +11,171 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Hola Princesa"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:text="TextView"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.155" />
+        tools:layout_editor_absoluteX="29dp" />
 
     <TextView
         android:id="@+id/txt_accel_y"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/txt_accel_z"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_accel_x" />
+        app:layout_constraintTop_toBottomOf="@+id/txt_accel_x"
+        tools:layout_editor_absoluteX="29dp" />
 
     <TextView
         android:id="@+id/txt_accel_z"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_marginTop="16dp"
         android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/txt_accel_y"
+        tools:layout_editor_absoluteX="29dp" />
 
     <TextView
         android:id="@+id/txt_alarm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:text="Safe"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_lat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Lat:"
+        app:layout_constraintTop_toBottomOf="@+id/txt_accel_z"
+        tools:layout_editor_absoluteX="30dp" />
+
+    <TextView
+        android:id="@+id/tv_lon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Lon:"
+        app:layout_constraintTop_toBottomOf="@+id/tv_lat"
+        tools:layout_editor_absoluteX="32dp" />
+
+    <TextView
+        android:id="@+id/tv_altitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Altitude:"
+        app:layout_constraintTop_toBottomOf="@+id/tv_lon"
+        tools:layout_editor_absoluteX="35dp" />
+
+    <TextView
+        android:id="@+id/tv_accuracy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Accuracy"
+        app:layout_constraintTop_toBottomOf="@+id/tv_altitude"
+        tools:layout_editor_absoluteX="33dp" />
+
+    <TextView
+        android:id="@+id/tv_speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Speed:"
+        app:layout_constraintTop_toBottomOf="@+id/tv_accuracy"
+        tools:layout_editor_absoluteX="35dp" />
+
+    <TextView
+        android:id="@+id/tv_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Adress"
+        app:layout_constraintTop_toBottomOf="@+id/tv_speed"
+        tools:layout_editor_absoluteX="37dp" />
+
+    <TextView
+        android:id="@+id/tv_updates"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Updates"
+        app:layout_constraintTop_toBottomOf="@+id/tv_address"
+        tools:layout_editor_absoluteX="41dp" />
+
+    <TextView
+        android:id="@+id/tv_sensor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Sensor"
+        app:layout_constraintTop_toBottomOf="@+id/tv_updates"
+        tools:layout_editor_absoluteX="43dp" />
+
+    <Switch
+        android:id="@+id/sw_gps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:text="Switch"
+        app:layout_constraintStart_toEndOf="@+id/tv_sensor"
+        app:layout_constraintTop_toTopOf="@+id/tv_sensor" />
+
+    <Switch
+        android:id="@+id/sw_locationsupdates"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:text="Switch"
+        app:layout_constraintStart_toEndOf="@+id/tv_updates"
+        app:layout_constraintTop_toTopOf="@+id/tv_updates" />
+
+    <TextView
+        android:id="@+id/tv_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Total count"
+        app:layout_constraintTop_toBottomOf="@+id/tv_sensor"
+        tools:layout_editor_absoluteX="40dp" />
+
+    <TextView
+        android:id="@+id/tv_max_x"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="Max X"
+        app:layout_constraintStart_toEndOf="@+id/txt_accel_x"
+        app:layout_constraintTop_toTopOf="@+id/txt_accel_x" />
+
+    <TextView
+        android:id="@+id/tv_max_y"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="Max Y"
+        app:layout_constraintStart_toEndOf="@+id/txt_accel_y"
+        app:layout_constraintTop_toTopOf="@+id/txt_accel_y" />
+
+    <TextView
+        android:id="@+id/tv_max_z"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="Max Z"
+        app:layout_constraintStart_toEndOf="@+id/txt_accel_z"
+        app:layout_constraintTop_toTopOf="@+id/txt_accel_z" />
+
+    <TextView
+        android:id="@+id/tv_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@+id/txt_alarm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
