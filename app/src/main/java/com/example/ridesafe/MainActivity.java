@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_timer;
     Switch sw_locationUpdates, sw_gps;
 
+    boolean on_fall= false;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             //previous_y=0;
             //previous_z=0;
             //mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-
+            on_fall=false;
         }
     };
 
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     private SensorEventListener sensorEventListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
+
+
             float x = event.values[0];
             float y = event.values[1];
             float z = event.values[2];
@@ -92,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
             txt_accel_y.setText("Y axis acceleration = "+ (int)y);
             txt_accel_z.setText("z axis acceleration = "+ (int)z);
 
+
+
             float changeX = Math.abs(x - previous_x);
             previous_x = x;
             float changeY = Math.abs(y - previous_y);
@@ -99,9 +104,15 @@ public class MainActivity extends AppCompatActivity {
             float changeZ = Math.abs(z - previous_z);
             previous_z = z;
 
+            if(on_fall){
+                return;
+            }
+
             if (changeX > 20 || changeY > 20 || changeZ > 20){
-                mSensorManager.unregisterListener(sensorEventListener);
-                mSensorManager.flush(sensorEventListener);
+                // TODO: review why unregister isn't working fine
+                // it looks like old values are used
+                //mSensorManager.unregisterListener(this);
+                on_fall=true;
 
                 counter++;
                 txt_fall.setText("Fall detected " + counter);
