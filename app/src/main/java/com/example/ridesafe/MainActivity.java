@@ -34,8 +34,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int DEFAULT_UPDATE_INTERVAL = 30000;
-    public static final int FAST_UPDATE_INTERVAL = 5000;
+    public static final int DEFAULT_UPDATE_INTERVAL = 2000;
+    public static final int FAST_UPDATE_INTERVAL = 1000;
     private static final int PERMISSIONS_FINE_LOCATION = 99;
     TextView txt_accel_x, txt_accel_y, txt_accel_z, txt_fall;
 
@@ -44,7 +44,11 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_timer;
     Switch sw_locationUpdates, sw_gps;
 
+    Location previous_location;
+    float distance= 999.99f;
+
     boolean on_fall= false;
+    boolean first_location = true;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
@@ -56,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     LocationCallback locationCallback;
 
 
-    CountDownTimer timer =  new CountDownTimer(5000, 1000) {
+    CountDownTimer timer =  new CountDownTimer(30000, 1000) {
 
         public void onTick(long millisUntilFinished) {
             tv_timer.setText(String.valueOf(millisUntilFinished));
@@ -113,13 +117,6 @@ public class MainActivity extends AppCompatActivity {
                 // it looks like old values are used
                 //mSensorManager.unregisterListener(this);
                 on_fall=true;
-
-                counter++;
-                txt_fall.setText("Fall detected " + counter);
-                txt_fall.setTextSize(50);
-                txt_fall.setTextColor(Color.RED);
-                tv_counter.setText("Total count= "+counter);
-
                 timer.start();
                 startLocationUpdates();
             }
@@ -204,14 +201,15 @@ public class MainActivity extends AppCompatActivity {
                 if (sw_locationUpdates.isChecked()){
                     // ON
                     //startLocationUpdates();
-                    mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+                    //mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
                 } else {
                     // OFF
-                    stopLocationUpdates();
+                    //stopLocationUpdates();
                 }
             }
         });
-        updateGPS();
+        //updateGPS();
+        //stopLocationUpdates();
 
     } //end onCreate
 
@@ -228,20 +226,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void startLocationUpdates() {
         tv_updates.setText("Location ON");
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
         updateGPS();
     }
 
     private void updateGPS(){
         // permissions
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+        //fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             // we have permission
             fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
                         // we got permission. Use location
-                    updateUIValues(location);
+                    //updateUIValues(location);
                 }
             });
 
@@ -255,15 +254,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateUIValues(Location location) {
+
         tv_lat.setText(String.valueOf("Lat: " +location.getLatitude()));
         tv_lon.setText(String.valueOf("Lon: "+location.getLongitude()));
-        tv_accuracy.setText(String.valueOf("Accuracy: "+location.getAccuracy()));
+        //tv_accuracy.setText(String.valueOf("Accuracy: "+location.getAccuracy()));
 
-        if (location.hasSpeed()){
-            tv_speed.setText("Speed: "+ String.valueOf(location.getSpeed()));
+
+        if(first_location){
+            previous_location=location;
+            first_location=false;
+            tv_accuracy.setText("We returned");
+            return;
         }else{
-            tv_speed.setText("Speed is not available");
+            tv_accuracy.setText("We get distance");
+            distance = location.distanceTo(previous_location);
         }
+
+        tv_speed.setText("Distance: " + String.valueOf(distance));
+        if(distance < 1f){
+            tv_altitude.setText("We are on a fall event");
+            counter++;
+            txt_fall.setText("Fall detected " + counter);
+            txt_fall.setTextSize(50);
+            txt_fall.setTextColor(Color.RED);
+            tv_counter.setText("Total count= "+counter);
+        }
+
+
         Geocoder geocoder= new Geocoder(MainActivity.this);
         try{
             List<Address> addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
@@ -286,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode){
             case PERMISSIONS_FINE_LOCATION:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    updateGPS();
+                    //updateGPS();
                 }
                 else{
                     Toast.makeText(this, "this app requires permission to be granted in to work properly", Toast.LENGTH_SHORT).show();
