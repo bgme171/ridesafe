@@ -5,13 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.hardware.TriggerEventListener;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -34,8 +33,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int DEFAULT_UPDATE_INTERVAL = 2000;
-    public static final int FAST_UPDATE_INTERVAL = 1000;
+    public static final int DEFAULT_UPDATE_INTERVAL = 1000;
+    public static final int FAST_UPDATE_INTERVAL = 500;
     private static final int PERMISSIONS_FINE_LOCATION = 99;
     TextView txt_accel_x, txt_accel_y, txt_accel_z, txt_fall;
 
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     LocationCallback locationCallback;
 
 
-    CountDownTimer timer =  new CountDownTimer(30000, 1000) {
+    CountDownTimer timer =  new CountDownTimer(10000, 1000) {
 
         public void onTick(long millisUntilFinished) {
             tv_timer.setText(String.valueOf(millisUntilFinished));
@@ -208,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        //updateGPS();
+        gps_register();
         //stopLocationUpdates();
 
     } //end onCreate
@@ -226,14 +225,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void startLocationUpdates() {
         tv_updates.setText("Location ON");
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+        //fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-        updateGPS();
     }
 
-    private void updateGPS(){
+    private void gps_register(){
         // permissions
-        //fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             // we have permission
             fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -272,12 +270,17 @@ public class MainActivity extends AppCompatActivity {
 
         tv_speed.setText("Distance: " + String.valueOf(distance));
         if(distance < 1f){
-            tv_altitude.setText("We are on a fall event");
-            counter++;
-            txt_fall.setText("Fall detected " + counter);
-            txt_fall.setTextSize(50);
-            txt_fall.setTextColor(Color.RED);
-            tv_counter.setText("Total count= "+counter);
+            //tv_altitude.setText("We are on a fall event");
+            //counter++;
+            //txt_fall.setText("Fall detected " + counter);
+            //txt_fall.setTextSize(50);
+            //txt_fall.setTextColor(Color.RED);
+            //tv_counter.setText("Total count= "+counter);
+            stopLocationUpdates();
+            timer.cancel();
+            Intent intent = new Intent(MainActivity.this, AlarmActivity.class);
+            intent.putExtra("last_location", location);
+            startActivity(intent);
         }
 
 
@@ -293,6 +296,8 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onResume() {
         super.onResume();
+        on_fall=false;
+        first_location=true;
         mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
 
