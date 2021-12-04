@@ -1,11 +1,15 @@
 package com.example.ridesafe;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
@@ -25,12 +29,14 @@ public class ContactsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_contacts);
 
 
+        ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_CONTACTS}, PackageManager.PERMISSION_GRANTED);
+
         txt_1 = (EditText) findViewById(R.id.txt_1);
         txt_2 = (EditText) findViewById(R.id.txt_2);
 
         SharedPreferences preferences = getSharedPreferences("contacts", Context.MODE_PRIVATE);
-        txt_1.setText(preferences.getString("uri1", ""));
-        txt_2.setText(preferences.getString("uri2", ""));
+        //txt_1.setText(preferences.getString("uri1", ""));
+        //txt_2.setText(preferences.getString("uri2", ""));
 
         b_save = findViewById(R.id.b_guardar);
 
@@ -52,6 +58,21 @@ public class ContactsActivity extends AppCompatActivity {
         finish();
     }
 
+    public void search(View view){
 
+        try {
+            Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                     new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER,
+                                  ContactsContract.CommonDataKinds.Phone.TYPE},
+                    "DISPLAY_NAME = '" + txt_1.getText().toString() + "'", null, null);
+
+            cursor.moveToFirst();
+            txt_2.setText(cursor.getString(0));
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
 
 }
