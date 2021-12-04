@@ -17,7 +17,6 @@ import android.widget.SimpleCursorAdapter;
 public class ContactsActivity extends AppCompatActivity {
 
     EditText txt_1, txt_2;
-    ListView lv_contacts;
     Button b_save;
 
     @Override
@@ -33,8 +32,6 @@ public class ContactsActivity extends AppCompatActivity {
         txt_1.setText(preferences.getString("uri1", ""));
         txt_2.setText(preferences.getString("uri2", ""));
 
-
-        lv_contacts = (ListView) findViewById(R.id.lv_contacts);
         b_save = findViewById(R.id.b_guardar);
 
 
