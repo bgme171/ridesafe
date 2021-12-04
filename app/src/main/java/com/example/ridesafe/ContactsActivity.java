@@ -1,11 +1,13 @@
 package com.example.ridesafe;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -14,6 +16,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,6 +35,9 @@ public class ContactsActivity extends AppCompatActivity {
     Set<String> contact_list;
     Uri tmp_uri;
 
+    ArrayList<String> nombres;
+    ArrayList<String> uris;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,25 +52,32 @@ public class ContactsActivity extends AppCompatActivity {
         tmp_uri = null;
         lv_contacts = (ListView) findViewById(R.id.lv_contacts);
 
-        SharedPreferences preferences = getSharedPreferences("contacts", Context.MODE_PRIVATE);
-        //txt_1.setText(preferences.getString("uri1", ""));
-        //txt_2.setText(preferences.getString("uri2", ""));
-        contact_list = preferences.getStringSet("contact_list", new HashSet<String>());
+        list_view_refresh();
+        lv_contacts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+               @Override
+               public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                   new AlertDialog.Builder(ContactsActivity.this)
+                        .setTitle("Eliminar contacto")
+                        .setMessage("El contacto será eliminado de tu lista de emergencias")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                    delete(position);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 
-        ArrayList<String> nombres = new ArrayList<>();
-        if(!contact_list.isEmpty()){
-            for(String tmp : contact_list){
-                String[] data = get_data_from_uri(Uri.parse(tmp));
-                nombres.add(data[0]);
-            }
-            //txt_1.setText(String.valueOf(contact_list.size()));
-        }else{
-            nombres.add("Sin contactos");
-        }
-        lv_contacts.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nombres));
+                            }
+                        })
+                        .show();
+                                               }
+                                           }
+        );
 
 
-        b_save =  findViewById(R.id.b_guardar);
+                b_save = findViewById(R.id.b_guardar);
 
 
 
@@ -81,8 +94,41 @@ public class ContactsActivity extends AppCompatActivity {
             editor.putStringSet("contact_list", tmp_contactList);
             editor.commit();
             tmp_uri=null;
-            finish();
+            list_view_refresh();
         }
+
+    }
+
+
+    public void list_view_refresh(){
+        SharedPreferences preferences = getSharedPreferences("contacts", Context.MODE_PRIVATE);
+        contact_list = preferences.getStringSet("contact_list", new HashSet<String>());
+
+        nombres = new ArrayList<>();
+        uris = new ArrayList<>();
+        if(!contact_list.isEmpty()){
+            for(String tmp : contact_list){
+                String[] data = get_data_from_uri(Uri.parse(tmp));
+                nombres.add(data[0]);
+                uris.add(tmp);
+            }
+            //txt_1.setText(String.valueOf(contact_list.size()));
+        }else{
+            nombres.add("Sin contactos");
+        }
+        lv_contacts.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nombres));
+    }
+
+    public void delete(int position){
+
+
+            SharedPreferences preferences = getSharedPreferences("contacts", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            Set<String> tmp_contactList = new HashSet<String>(preferences.getStringSet("contact_list", new HashSet<String>()));
+            tmp_contactList.remove(uris.get(position));
+            editor.putStringSet("contact_list", tmp_contactList);
+            editor.commit();
+            list_view_refresh();
 
     }
 
