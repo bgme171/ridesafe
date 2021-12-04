@@ -1,5 +1,6 @@
 package com.example.ridesafe;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -75,4 +76,36 @@ public class ContactsActivity extends AppCompatActivity {
 
     }
 
+    public void buscar(View view){
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+
+        startActivityForResult(intent, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 1 && resultCode == RESULT_OK){
+
+            Uri uri = data.getData();
+            Cursor cursor = getContentResolver().query(uri,null, null, null, null);
+
+            if(cursor != null && cursor.moveToFirst()){
+                int name_idx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                int number_idx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+
+                String nombre = cursor.getString(name_idx);
+                String numero = cursor.getString(number_idx);
+
+                txt_1.setText(nombre);
+                txt_2.setText(numero);
+
+            }
+
+        }
+
+
+    }
 }
