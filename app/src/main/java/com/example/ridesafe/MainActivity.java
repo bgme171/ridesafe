@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_counter, tv_max_x, tv_max_y, tv_max_z;
     TextView tv_timer;
     Switch sw_locationUpdates, sw_gps;
+
+    Button b_contacts;
 
     Location previous_location;
     float distance= 999.99f;
@@ -174,6 +177,17 @@ public class MainActivity extends AppCompatActivity {
         tv_max_z=findViewById(R.id.tv_max_z);
 
         tv_timer = findViewById(R.id.tv_timer);
+
+        b_contacts = findViewById(R.id.b_contacts);
+
+
+        b_contacts.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ContactsActivity.class);
+                //intent.putExtra("last_location", location);
+                startActivity(intent);
+            }
+        });
 
         // get max capabilities of sensor
         // tv_sensor.setText(String.valueOf(mAccelerometer.getMinDelay()));
