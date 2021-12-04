@@ -14,15 +14,23 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 public class ContactsActivity extends AppCompatActivity {
 
     EditText txt_1, txt_2;
     Button b_save;
+    ListView lv_contacts;
+    Set<String> contact_list;
+    Uri tmp_uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,28 +43,47 @@ public class ContactsActivity extends AppCompatActivity {
         txt_1 = (EditText) findViewById(R.id.txt_1);
         txt_2 = (EditText) findViewById(R.id.txt_2);
 
+        tmp_uri = null;
+        lv_contacts = (ListView) findViewById(R.id.lv_contacts);
+
         SharedPreferences preferences = getSharedPreferences("contacts", Context.MODE_PRIVATE);
         //txt_1.setText(preferences.getString("uri1", ""));
         //txt_2.setText(preferences.getString("uri2", ""));
+        contact_list = preferences.getStringSet("contact_list", new HashSet<String>());
 
-        b_save = findViewById(R.id.b_guardar);
-
-
-        b_save.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                save();
+        ArrayList<String> nombres = new ArrayList<>();
+        if(!contact_list.isEmpty()){
+            for(String tmp : contact_list){
+                String[] data = get_data_from_uri(Uri.parse(tmp));
+                nombres.add(data[0]);
             }
-        });
+            //txt_1.setText(String.valueOf(contact_list.size()));
+        }else{
+            nombres.add("Sin contactos");
+        }
+        lv_contacts.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nombres));
+
+
+        b_save =  findViewById(R.id.b_guardar);
+
+
 
     }
 
-    public void save(){
-        SharedPreferences preferences = getSharedPreferences("contacts", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("uri1", txt_1.getText().toString());
-        editor.putString("uri2", txt_2.getText().toString());
-        editor.commit();
-        finish();
+    public void save(View view){
+
+        if(tmp_uri!= null){
+            SharedPreferences preferences = getSharedPreferences("contacts", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+
+            Set<String> tmp_contactList = new HashSet<String>(preferences.getStringSet("contact_list", new HashSet<String>()));
+            tmp_contactList.add(tmp_uri.toString());
+            editor.putStringSet("contact_list", tmp_contactList);
+            editor.commit();
+            tmp_uri=null;
+            finish();
+        }
+
     }
 
     public void search(View view){
@@ -90,22 +117,29 @@ public class ContactsActivity extends AppCompatActivity {
         if(requestCode == 1 && resultCode == RESULT_OK){
 
             Uri uri = data.getData();
-            Cursor cursor = getContentResolver().query(uri,null, null, null, null);
-
-            if(cursor != null && cursor.moveToFirst()){
-                int name_idx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
-                int number_idx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-
-                String nombre = cursor.getString(name_idx);
-                String numero = cursor.getString(number_idx);
-
-                txt_1.setText(nombre);
-                txt_2.setText(numero);
-
-            }
-
+            String[] info = get_data_from_uri(uri);
+            txt_1.setText(info[0]);
+            txt_2.setText(info[1]);
+            tmp_uri = uri;
         }
 
 
+    }
+
+
+    public String[] get_data_from_uri(Uri uri){
+
+        Cursor cursor = getContentResolver().query(uri,null, null, null, null);
+
+        if(cursor != null && cursor.moveToFirst()){
+            int name_idx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+            int number_idx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+
+            String nombre = cursor.getString(name_idx);
+            String numero = cursor.getString(number_idx);
+            return new String[] {nombre, numero};
+
+        }
+        return null;
     }
 }

@@ -7,6 +7,7 @@
         <entry key="..\:/Users/morab/AndroidStudioProjects/RideSafe/app/src/main/res/layout/activity_alarm_screen.xml" value="0.28125" />
         <entry key="..\:/Users/morab/AndroidStudioProjects/RideSafe/app/src/main/res/layout/activity_contacts.xml" value="0.213768115942029" />
         <entry key="..\:/Users/morab/AndroidStudioProjects/RideSafe/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/morab/AndroidStudioProjects/RideSafe/app/src/main/res/layout/contacts_fragment.xml" value="0.213768115942029" />
         <entry key="..\:/Users/morab/AndroidStudioProjects/RideSafe/app/src/main/res/layout/contacts_list_item.xml" value="0.213768115942029" />
         <entry key="..\:/Users/morab/AndroidStudioProjects/RideSafe/app/src/main/res/layout/contacts_list_view.xml" value="0.213768115942029" />
       </map>
@@ -17,5 +18,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.213768115942029" />
+      </ProjectState>
+    </option>
   </component>
 </project>
