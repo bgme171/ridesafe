@@ -177,7 +177,7 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
 
-    public String[] get_data_from_uri(Uri uri){
+    private String[] get_data_from_uri(Uri uri){
 
         Cursor cursor = getContentResolver().query(uri,null, null, null, null);
 

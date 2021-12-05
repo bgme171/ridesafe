@@ -149,6 +149,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.SEND_SMS}, 2);
+        }
+
+
         txt_accel_x = findViewById(R.id.txt_accel_x);
         txt_accel_y = findViewById(R.id.txt_accel_y);
         txt_accel_z = findViewById(R.id.txt_accel_z);
@@ -283,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         tv_speed.setText("Distance: " + String.valueOf(distance));
-        if(distance < 1f){
+        if(distance < 10f){
             //tv_altitude.setText("We are on a fall event");
             //counter++;
             //txt_fall.setText("Fall detected " + counter);
@@ -312,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         on_fall=false;
         first_location=true;
-        mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        //mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
@@ -333,6 +338,6 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onPause() {
         super.onPause();
-        mSensorManager.unregisterListener(sensorEventListener);
+       // mSensorManager.unregisterListener(sensorEventListener);
     }
 }
