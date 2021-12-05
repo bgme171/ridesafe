@@ -73,6 +73,8 @@ public class ContactsActivity extends AppCompatActivity {
                         })
                         .show();
                                                }
+
+
                                            }
         );
 
@@ -112,9 +114,11 @@ public class ContactsActivity extends AppCompatActivity {
                 nombres.add(data[0]);
                 uris.add(tmp);
             }
-            //txt_1.setText(String.valueOf(contact_list.size()));
+            lv_contacts.setEnabled(true);
         }else{
             nombres.add("Sin contactos");
+            lv_contacts.setEnabled(false);
+
         }
         lv_contacts.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nombres));
     }
