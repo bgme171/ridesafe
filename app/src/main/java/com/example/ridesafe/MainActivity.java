@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_timer;
     Switch sw_locationUpdates, sw_gps;
 
-    Button b_contacts;
+    Button b_contacts, b_start, b_stop;
 
     Location previous_location;
     float distance= 999.99f;
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            if (changeX > 20 || changeY > 20 || changeZ > 20){
+            if (changeX > 80 || changeY > 80 || changeZ > 80){
                 // TODO: review why unregister isn't working fine
                 // it looks like old values are used
                 //mSensorManager.unregisterListener(this);
@@ -153,6 +153,9 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.SEND_SMS}, 2);
         }
 
+//        if(ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SYSTEM_ALERT_WINDOW) != PackageManager.PERMISSION_GRANTED){
+//            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.SYSTEM_ALERT_WINDOW}, 3);
+//        }
 
         txt_accel_x = findViewById(R.id.txt_accel_x);
         txt_accel_y = findViewById(R.id.txt_accel_y);
@@ -184,6 +187,8 @@ public class MainActivity extends AppCompatActivity {
         tv_timer = findViewById(R.id.tv_timer);
 
         b_contacts = findViewById(R.id.b_contacts);
+        b_start = findViewById(R.id.b_start);
+        b_stop = findViewById(R.id.b_stop);
 
 
         b_contacts.setOnClickListener(new View.OnClickListener() {
@@ -287,8 +292,9 @@ public class MainActivity extends AppCompatActivity {
             distance = location.distanceTo(previous_location);
         }
 
+
         tv_speed.setText("Distance: " + String.valueOf(distance));
-        if(distance < 10f){
+        if(distance < location.getAccuracy()){
             //tv_altitude.setText("We are on a fall event");
             //counter++;
             //txt_fall.setText("Fall detected " + counter);
@@ -317,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         on_fall=false;
         first_location=true;
-        //mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
@@ -338,6 +344,21 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onPause() {
         super.onPause();
-       // mSensorManager.unregisterListener(sensorEventListener);
+       mSensorManager.unregisterListener(sensorEventListener);
     }
+
+    public void start_service(View view){
+
+        Intent myService = new Intent(MainActivity.this, AccelService.class);
+        MainActivity.this.startService(myService);
+    }
+
+    public void stop_service(View view){
+
+        Intent myService = new Intent(MainActivity.this, AccelService.class);
+        MainActivity.this.stopService(myService);
+
+    }
+
+
 }

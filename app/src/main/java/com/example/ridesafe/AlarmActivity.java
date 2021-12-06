@@ -39,7 +39,7 @@ public class AlarmActivity extends AppCompatActivity {
     Button b_cancel;
     Location location;
 
-    CountDownTimer alarm_timer =  new CountDownTimer(10000, 1000) {
+    CountDownTimer alarm_timer =  new CountDownTimer(30000, 1000) {
 
 
         public void onTick(long millisUntilFinished) {
