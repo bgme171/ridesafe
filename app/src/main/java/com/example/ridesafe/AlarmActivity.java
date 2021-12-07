@@ -169,15 +169,12 @@ public class AlarmActivity extends AppCompatActivity{
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
 
-
         mediaPlayer = MediaPlayer.create(this, R.raw.sci_alarm);
         mediaPlayer.setLooping(true);
         mediaPlayer.setVolume(100,100);
         mediaPlayer.start();
 
         tv_alarm_timer = findViewById(R.id.tv_alarm_timer);
-        //tv_alarm_timer.setTextSize(50);
-        //tv_alarm_timer.setTextColor(Color.RED);
 
         b_cancel=findViewById(R.id.b_cancel);
 

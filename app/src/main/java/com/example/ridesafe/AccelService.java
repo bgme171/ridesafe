@@ -1,5 +1,7 @@
 package com.example.ridesafe;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -12,7 +14,6 @@ import android.os.IBinder;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -54,15 +55,6 @@ public class AccelService extends Service {
             on_fall = false;
             distance = 9999f;
             first_location = true;
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(AccelService.this, "256")
-                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                    .setContentTitle("Timer finalizó")
-                    .setContentText("")
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AccelService.this);
-            notificationManager.notify(666, builder.build());
-
         }
     };
 
@@ -151,26 +143,10 @@ public class AccelService extends Service {
             previous_location=location;
             first_location=false;
 
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(AccelService.this, "256")
-                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                    .setContentTitle("Obtuve primera localización")
-                    .setContentText("")
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AccelService.this);
-            notificationManager.notify(669, builder.build());
-
             return;
         }else{
             distance = location.distanceTo(previous_location);
         }
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(AccelService.this, "256")
-                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                .setContentTitle("Distancia")
-                .setContentText( String.valueOf(distance))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AccelService.this);
-        notificationManager.notify(668, builder.build());
 
         if(distance < location.getAccuracy()){
             stopLocationUpdates();
@@ -181,12 +157,24 @@ public class AccelService extends Service {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
 
+            stopForeground(true);
             stopSelf();
         }
 
     } //end updateUIValues
 
     public int onStartCommand(Intent intent, int flags, int startId){
+        Intent main_activity = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, main_activity, 0);
+
+        Notification notification = new NotificationCompat.Builder(AccelService.this, "256")
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+                .setContentTitle("RideSafe está activo")
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT).build();
+
+        startForeground(1,notification);
+
         mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
         return START_STICKY;
     } //end onStartCommand
@@ -196,6 +184,8 @@ public class AccelService extends Service {
         timer.cancel();
         mSensorManager.unregisterListener(sensorEventListener);
         stopLocationUpdates();
+        stopForeground(true);
+        stopSelf();
     } //end onDestroy
 
     @Nullable
