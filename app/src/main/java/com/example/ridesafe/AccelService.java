@@ -1,6 +1,5 @@
 package com.example.ridesafe;
 
-
 import android.app.Service;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -101,7 +100,7 @@ public class AccelService extends Service {
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
         }
-    }; // end  eventListener accel
+    }; //end  SensorEventListener
 
 
     public void onCreate() {
@@ -114,9 +113,12 @@ public class AccelService extends Service {
         previous_y = 0;
         previous_z = 0;
 
+
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-//      mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(AccelService.this);
 
         locationRequest = LocationRequest.create()
                 .setInterval(DEFAULT_UPDATE_INTERVAL)
@@ -134,16 +136,15 @@ public class AccelService extends Service {
             }
         };
 
-    }
+    } //end onCreate
 
     private void stopLocationUpdates() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-    }
+    } //end stopLocationUpdates
 
     private void startLocationUpdates() {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(AccelService.this);
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-    }
+    } //end startLocationUpdates
 
     private void updateUIValues(Location location) {
 
@@ -164,46 +165,39 @@ public class AccelService extends Service {
             distance = location.distanceTo(previous_location);
         }
 
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(AccelService.this, "256")
+                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+                .setContentTitle("Distancia")
+                .setContentText( String.valueOf(distance))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AccelService.this);
+        notificationManager.notify(668, builder.build());
 
         if(distance < location.getAccuracy()){
             stopLocationUpdates();
             timer.cancel();
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(AccelService.this, "256")
-                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                    .setContentTitle("Vergazo")
-                    .setContentText("Distancia: " + String.valueOf(distance))
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AccelService.this);
-            notificationManager.notify(667, builder.build());
 
             Intent intent = new Intent(AccelService.this, AlarmActivity.class);
             intent.putExtra("last_location", location);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
 
-        }else{
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(AccelService.this, "256")
-                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                    .setContentTitle("Distancia")
-                    .setContentText( String.valueOf(distance))
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AccelService.this);
-            notificationManager.notify(668, builder.build());
+            stopSelf();
         }
 
-
-    }
+    } //end updateUIValues
 
     public int onStartCommand(Intent intent, int flags, int startId){
         mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
         return START_STICKY;
-    }
+    } //end onStartCommand
 
     public void onDestroy(){
         super.onDestroy();
-    }
-
+        timer.cancel();
+        mSensorManager.unregisterListener(sensorEventListener);
+        stopLocationUpdates();
+    } //end onDestroy
 
     @Nullable
     @Override

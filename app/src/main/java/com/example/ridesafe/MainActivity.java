@@ -39,284 +39,61 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-//    public static final int DEFAULT_UPDATE_INTERVAL = 1000;
-//    public static final int FAST_UPDATE_INTERVAL = 500;
-    private static final int PERMISSIONS_FINE_LOCATION = 99;
+    private static final int PERMISSIONS_FINE_LOCATION = 1;
+    private static final int PERMISSIONS_SEND_SMS = 2;
     public static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE= 2323;
-//    TextView txt_accel_x, txt_accel_y, txt_accel_z, txt_fall;
-//
-//    TextView tv_lat, tv_altitude, tv_lon, tv_accuracy, tv_speed, tv_sensor, tv_updates, tv_address;
-//    TextView tv_counter, tv_max_x, tv_max_y, tv_max_z;
-//    TextView tv_timer;
-//    Switch sw_locationUpdates, sw_gps;
-
     Button b_contacts, b_start, b_stop, b_permission;
 
-//    Location previous_location;
-//    float distance= 999.99f;
-//
-//    boolean on_fall= false;
-//    boolean first_location = true;
-//
-//    private SensorManager mSensorManager;
-//    private Sensor mAccelerometer;
-//    private float previous_x, previous_y, previous_z = 0;
-//
-//    // Location request is a config file for all settings related to FusedLocationProviderClient
-//    LocationRequest locationRequest;
-//
-//    LocationCallback locationCallback;
-//
-//
-//    CountDownTimer timer =  new CountDownTimer(10000, 1000) {
-//
-//        public void onTick(long millisUntilFinished) {
-//            tv_timer.setText(String.valueOf(millisUntilFinished));
-//        }
-//
-//        public void onFinish() {
-//            stopLocationUpdates();
-//            //previous_x=0;
-//            //previous_y=0;
-//            //previous_z=0;
-//            //mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-//            on_fall=false;
-//        }
-//    };
-//
-//
-//    int counter = 0;
-//    float max_x, max_y, max_z =0;
-//
-    // Google's API for location services.
-//    FusedLocationProviderClient fusedLocationProviderClient;
-
-
-
-
-//    private SensorEventListener sensorEventListener = new SensorEventListener() {
-//        @Override
-//        public void onSensorChanged(SensorEvent event) {
-//
-//
-//            float x = event.values[0];
-//            float y = event.values[1];
-//            float z = event.values[2];
-//
-//            txt_accel_x.setText("X axis acceleration = "+ (int)x);
-//            txt_accel_y.setText("Y axis acceleration = "+ (int)y);
-//            txt_accel_z.setText("z axis acceleration = "+ (int)z);
-//
-//
-//
-//            float changeX = Math.abs(x - previous_x);
-//            previous_x = x;
-//            float changeY = Math.abs(y - previous_y);
-//            previous_y = y;
-//            float changeZ = Math.abs(z - previous_z);
-//            previous_z = z;
-//
-//            if(on_fall){
-//                return;
-//            }
-//
-//            if (changeX > 80 || changeY > 80 || changeZ > 80){
-//                // TODO: review why unregister isn't working fine
-//                // it looks like old values are used
-//                //mSensorManager.unregisterListener(this);
-//                on_fall=true;
-//                timer.start();
-//                startLocationUpdates();
-//            }
-//
-//            if(changeX > max_x){
-//                max_x= changeX;
-//                tv_max_x.setText("Max delta on X= "+max_x);
-//            }
-//            if(changeY > max_y){
-//                max_y= changeY;
-//                tv_max_y.setText("Max delta on y= "+max_y);
-//            }
-//            if(changeZ > max_z){
-//                max_z= changeZ;
-//                tv_max_z.setText("Max delta on Z= "+max_z);
-//            }
-//
-//        }
-//
-//        @Override
-//        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-//
-//        }
-//    }; // end  eventListener accel
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},PERMISSIONS_FINE_LOCATION);
+            }
+        }
+
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.SEND_SMS}, 2);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            requestPermissions(new String[]{Manifest.permission.SEND_SMS}, PERMISSIONS_SEND_SMS);
+            }
         }
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !Settings.canDrawOverlays(MainActivity.this)){
-            RequestPermission();
-        }
-
-
-//        txt_accel_x = findViewById(R.id.txt_accel_x);
-//        txt_accel_y = findViewById(R.id.txt_accel_y);
-//        txt_accel_z = findViewById(R.id.txt_accel_z);
-//
-//        txt_fall = findViewById(R.id.txt_alarm);
-//
-//        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-//        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-//        mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-//
-//
-//        tv_lat=findViewById(R.id.tv_lat);
-//        tv_lon=findViewById(R.id.tv_lon);
-//        tv_altitude=findViewById(R.id.tv_altitude);
-//        tv_accuracy=findViewById(R.id.tv_accuracy);
-//        tv_speed=findViewById(R.id.tv_speed);
-//        tv_sensor=findViewById(R.id.tv_sensor);
-//        tv_address=findViewById(R.id.tv_address);
-//        tv_updates=findViewById(R.id.tv_updates);
-//        sw_gps=findViewById(R.id.sw_gps);
-//        sw_locationUpdates=findViewById(R.id.sw_locationsupdates);
-//
-//        tv_counter=findViewById(R.id.tv_counter);
-//        tv_max_x=findViewById(R.id.tv_max_x);
-//        tv_max_y=findViewById(R.id.tv_max_y);
-//        tv_max_z=findViewById(R.id.tv_max_z);
-//
-//        tv_timer = findViewById(R.id.tv_timer);
 
         b_contacts = findViewById(R.id.b_contacts);
         b_start = findViewById(R.id.b_start);
         b_stop = findViewById(R.id.b_stop);
-        b_stop  = findViewById(R.id.b_permission);
+        b_permission  = findViewById(R.id.b_permission);
 
 
         b_contacts.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ContactsActivity.class);
-                //intent.putExtra("last_location", location);
                 startActivity(intent);
             }
         });
 
+        b_permission.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !Settings.canDrawOverlays(MainActivity.this)){
+                    RequestPermission();
+                }else{
+                    Toast.makeText(MainActivity.this, "Permisos de sobreposición ya fueron otorgados", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
-//        locationRequest = LocationRequest.create()
-//                .setInterval(DEFAULT_UPDATE_INTERVAL)
-//                .setFastestInterval(FAST_UPDATE_INTERVAL)
-//                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-//                .setMaxWaitTime(100);
-//
-//        locationCallback = new LocationCallback() {
-//            @Override
-//            public void onLocationResult(@NonNull LocationResult locationResult) {
-//                super.onLocationResult(locationResult);
-//
-//                Location location = locationResult.getLastLocation();
-//                updateUIValues(location);
-//            }
-//        };
-
-        gps_register();
         createNotificationChannel();
 
     } //end onCreate
 
-//    private void stopLocationUpdates() {
-//        tv_updates.setText("Location OFF");
-//        tv_lon.setText("Not available");
-//        tv_lat.setText("Not available");
-//        tv_accuracy.setText("Not available");
-//        tv_altitude.setText("Not available");
-//        tv_speed.setText("Not available");
-//        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-//
-//    }
-//
-//    private void startLocationUpdates() {
-//        tv_updates.setText("Location ON");
-//        //fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
-//        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
-//    }
-
-    private void gps_register(){
-        // permissions
-//        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-//            // we have permission
-//            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-//                @Override
-//                public void onSuccess(Location location) {
-//                        // we got permission. Use location
-//                }
-//            });
-
-        }
-        else{
-            // we need to ask for permission
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},PERMISSIONS_FINE_LOCATION);
-            }
-        }
-    }
-
-//    private void updateUIValues(Location location) {
-//
-//        tv_lat.setText(String.valueOf("Lat: " +location.getLatitude()));
-//        tv_lon.setText(String.valueOf("Lon: "+location.getLongitude()));
-//        //tv_accuracy.setText(String.valueOf("Accuracy: "+location.getAccuracy()));
-//
-//
-//        if(first_location){
-//            previous_location=location;
-//            first_location=false;
-//            tv_accuracy.setText("We returned");
-//            return;
-//        }else{
-//            tv_accuracy.setText("We get distance");
-//            distance = location.distanceTo(previous_location);
-//        }
-//
-//
-//        tv_speed.setText("Distance: " + String.valueOf(distance));
-//        if(distance < location.getAccuracy()){
-//            //tv_altitude.setText("We are on a fall event");
-//            //counter++;
-//            //txt_fall.setText("Fall detected " + counter);
-//            //txt_fall.setTextSize(50);
-//            //txt_fall.setTextColor(Color.RED);
-//            //tv_counter.setText("Total count= "+counter);
-//            stopLocationUpdates();
-//            timer.cancel();
-//            Intent intent = new Intent(MainActivity.this, AlarmActivity.class);
-//            intent.putExtra("last_location", location);
-//            startActivity(intent);
-//        }
-//
-//
-//        Geocoder geocoder= new Geocoder(MainActivity.this);
-//        try{
-//            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-//            tv_address.setText("Address: "+ addresses.get(0).getAddressLine(0));
-//        }catch (Exception e){
-//            tv_address.setText("Address couldn't be get");
-//        }
-//
-//    }
 
     protected void onResume() {
         super.onResume();
-       // on_fall=false;
-       // first_location=true;
-        //mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-    }
+    } //end onResume
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -324,30 +101,37 @@ public class MainActivity extends AppCompatActivity {
 
         switch (requestCode){
             case PERMISSIONS_FINE_LOCATION:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    //updateGPS();
-                }
-                else{
-                    Toast.makeText(this, "this app requires permission to be granted in to work properly", Toast.LENGTH_SHORT).show();
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this, "RideSafe necesita permisos para acceder ubicación", Toast.LENGTH_SHORT).show();
                     finish();
                 }
+                break;
+            case PERMISSIONS_SEND_SMS:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this, "RiseSafe necesita permisos para  enviar SMS", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                break;
         }
-    }
+    } //end onRequestPermissionsResult
 
     protected void onPause() {
         super.onPause();
-       //mSensorManager.unregisterListener(sensorEventListener);
-    }
+    } //end onPause
 
     public void start_service(View view){
-        Intent myService = new Intent(MainActivity.this, AccelService.class);
-        MainActivity.this.startService(myService);
-    }
+        b_start.setEnabled(false);
+        b_stop.setEnabled(true);
+        Intent myService = new Intent(getApplicationContext(), AccelService.class);
+        getApplicationContext().startService(myService);
+    } //end start_service
 
     public void stop_service(View view){
-        Intent myService = new Intent(MainActivity.this, AccelService.class);
-        MainActivity.this.stopService(myService);
-    }
+        b_start.setEnabled(true);
+        b_stop.setEnabled(false);
+        Intent myService = new Intent(getApplicationContext(), AccelService.class);
+        getApplicationContext().stopService(myService);
+    } //end stop_service
 
 
     private void createNotificationChannel() {
@@ -364,9 +148,7 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
-    }
-
-    // request over
+    } //end createNotificationChannel
 
     private void RequestPermission() {
         // Check if Android M or higher
@@ -378,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                     Uri.parse("package:" + MainActivity.this.getPackageName()));
             startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
         }
-    }
+    } //end RequestPermission
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -387,17 +169,12 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (!Settings.canDrawOverlays(MainActivity.this)) {
-                    //
+                    Toast.makeText(this, "RideSafe necesita permisos de sobreposición", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
-                else
-                {
-                    // Permission Granted-System will work
-                }
-
             }
         }
-    }
-
+    } //end onActivityResult
 
 
 }

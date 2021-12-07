@@ -34,7 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AlarmActivity extends AppCompatActivity {
+public class AlarmActivity extends AppCompatActivity{
 
     TextView tv_alarm_timer, tv_location;
     Button b_cancel;
@@ -78,7 +78,7 @@ public class AlarmActivity extends AppCompatActivity {
             smsManager.sendMultipartTextMessage(number.replace("+",""), null, parts, null, null);
         }
 
-    }
+    } //end send_sms
 
 
     public String get_adrress(){
@@ -90,7 +90,7 @@ public class AlarmActivity extends AppCompatActivity {
             return "NA";
         }
 
-    }
+    } //end get_adrress
 
     public ArrayList<String> get_numbers(){
         SharedPreferences preferences = getSharedPreferences("contacts", Context.MODE_PRIVATE);
@@ -98,16 +98,13 @@ public class AlarmActivity extends AppCompatActivity {
 
         ArrayList<String> numbers = new ArrayList<String>();
 
-
-
         for(String tmp : contact_list){
             String[] data = get_data_from_uri(Uri.parse(tmp));
             numbers.add(data[1]);
-
         }
 
         return numbers;
-    }
+    } //end get_numbers
 
 
     private String[] get_data_from_uri(Uri uri){
@@ -124,7 +121,7 @@ public class AlarmActivity extends AppCompatActivity {
 
         }
         return null;
-    }
+    } //end get_data_from_uri
 
 
     @Override
@@ -164,11 +161,10 @@ public class AlarmActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            // Get the last known location provide by the service
+            // This is the location that will be sent to the contacts
             location = (Location) extras.get("last_location");
-            //The key argument here must match that used in the other activity
-            tv_location.setText(String.valueOf("Lat: " + location.getLatitude()));
         }
-
 
         alarm_timer.start();
 
@@ -179,12 +175,14 @@ public class AlarmActivity extends AppCompatActivity {
                 }
                 mediaPlayer.release();
                 mediaPlayer=null;
+
+                Intent myService =  new Intent(getApplicationContext(), AccelService.class);
+                startService(myService);
+
                 finish();
 
             }
         });
-
-
-
+        
     }
 }
