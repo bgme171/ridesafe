@@ -1,47 +1,29 @@
 package com.example.ridesafe;
 
-import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+
 import android.app.Service;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
-import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.IBinder;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-
-import java.util.List;
-
 public class AccelService extends Service {
-
-    MediaPlayer mediaPlayer;
 
     public static final int DEFAULT_UPDATE_INTERVAL = 1000;
     public static final int FAST_UPDATE_INTERVAL = 500;
-    private static final int PERMISSIONS_FINE_LOCATION = 99;
 
     Location previous_location;
     float distance;
@@ -51,7 +33,7 @@ public class AccelService extends Service {
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private float previous_x, previous_y, previous_z = 0;
+    private float previous_x, previous_y, previous_z;
 
     // Location request is a config file for all settings related to FusedLocationProviderClient
     LocationRequest locationRequest;
@@ -62,7 +44,7 @@ public class AccelService extends Service {
     FusedLocationProviderClient fusedLocationProviderClient;
 
 
-    CountDownTimer timer =  new CountDownTimer(10000, 1000) {
+    CountDownTimer timer = new CountDownTimer(10000, 1000) {
 
         public void onTick(long millisUntilFinished) {
 
@@ -70,13 +52,9 @@ public class AccelService extends Service {
 
         public void onFinish() {
             stopLocationUpdates();
-            //previous_x=0;
-            //previous_y=0;
-            //previous_z=0;
-            //mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-            on_fall=false;
-            distance= 9999f;
-            first_location=true;
+            on_fall = false;
+            distance = 9999f;
+            first_location = true;
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(AccelService.this, "256")
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
@@ -84,8 +62,6 @@ public class AccelService extends Service {
                     .setContentText("")
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AccelService.this);
-
-// notificationId is a unique int for each notification that you must define
             notificationManager.notify(666, builder.build());
 
         }
@@ -95,11 +71,9 @@ public class AccelService extends Service {
         @Override
         public void onSensorChanged(SensorEvent event) {
 
-
             float x = event.values[0];
             float y = event.values[1];
             float z = event.values[2];
-
 
             float changeX = Math.abs(x - previous_x);
             previous_x = x;
@@ -108,17 +82,16 @@ public class AccelService extends Service {
             float changeZ = Math.abs(z - previous_z);
             previous_z = z;
 
-            if(on_fall){
+            if (on_fall) {
                 return;
             }
 
-            if (changeX > 20 || changeY > 20 || changeZ > 20){
-                // TODO: review why unregister isn't working fine
+            if (changeX > 20 || changeY > 20 || changeZ > 20) {
+                // FIXME: review why unregister isn't working fine
                 // it looks like old values are used
                 //mSensorManager.unregisterListener(this);
-                on_fall=true;
+                on_fall = true;
                 timer.start();
-
                 startLocationUpdates();
             }
 
@@ -131,28 +104,25 @@ public class AccelService extends Service {
     }; // end  eventListener accel
 
 
-
-
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
-        mediaPlayer = MediaPlayer.create(this, R.raw.sci_alarm);
-        mediaPlayer.setLooping(true);
-        mediaPlayer.setVolume(100,100);
 
         on_fall = false;
         first_location = true;
-        distance=9999f;
+        distance = 9999f;
+        previous_x = 0;
+        previous_y = 0;
+        previous_z = 0;
 
-        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-
+//      mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
 
         locationRequest = LocationRequest.create()
                 .setInterval(DEFAULT_UPDATE_INTERVAL)
                 .setFastestInterval(FAST_UPDATE_INTERVAL)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setMaxWaitTime(100);
+                .setMaxWaitTime(1000);
 
         locationCallback = new LocationCallback() {
             @Override
@@ -164,9 +134,7 @@ public class AccelService extends Service {
             }
         };
 
-
     }
-
 
     private void stopLocationUpdates() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
@@ -189,9 +157,7 @@ public class AccelService extends Service {
                     .setContentText("")
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AccelService.this);
-
-// notificationId is a unique int for each notification that you must define
-            notificationManager.notify(667, builder.build());
+            notificationManager.notify(669, builder.build());
 
             return;
         }else{
@@ -199,11 +165,9 @@ public class AccelService extends Service {
         }
 
 
-
         if(distance < location.getAccuracy()){
             stopLocationUpdates();
             timer.cancel();
-
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(AccelService.this, "256")
                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
@@ -211,13 +175,12 @@ public class AccelService extends Service {
                     .setContentText("Distancia: " + String.valueOf(distance))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AccelService.this);
-
-// notificationId is a unique int for each notification that you must define
             notificationManager.notify(667, builder.build());
 
-//            Intent intent = new Intent(AccelService.this, AlarmActivity.class);
-//            intent.putExtra("last_location", location);
-//            startActivity(intent);
+            Intent intent = new Intent(AccelService.this, AlarmActivity.class);
+            intent.putExtra("last_location", location);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
 
         }else{
             NotificationCompat.Builder builder = new NotificationCompat.Builder(AccelService.this, "256")
@@ -226,8 +189,6 @@ public class AccelService extends Service {
                     .setContentText( String.valueOf(distance))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AccelService.this);
-
-// notificationId is a unique int for each notification that you must define
             notificationManager.notify(668, builder.build());
         }
 
@@ -235,18 +196,12 @@ public class AccelService extends Service {
     }
 
     public int onStartCommand(Intent intent, int flags, int startId){
-        mediaPlayer.start();
+        mSensorManager.registerListener(sensorEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
         return START_STICKY;
     }
 
     public void onDestroy(){
         super.onDestroy();
-
-        if(mediaPlayer.isPlaying()){
-            mediaPlayer.stop();
-        }
-        mediaPlayer.release();
-        mediaPlayer=null;
     }
 
 

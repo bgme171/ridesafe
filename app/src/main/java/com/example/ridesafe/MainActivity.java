@@ -1,6 +1,7 @@
 package com.example.ridesafe;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -16,9 +17,11 @@ import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
@@ -39,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 //    public static final int DEFAULT_UPDATE_INTERVAL = 1000;
 //    public static final int FAST_UPDATE_INTERVAL = 500;
     private static final int PERMISSIONS_FINE_LOCATION = 99;
+    public static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE= 2323;
 //    TextView txt_accel_x, txt_accel_y, txt_accel_z, txt_fall;
 //
 //    TextView tv_lat, tv_altitude, tv_lon, tv_accuracy, tv_speed, tv_sensor, tv_updates, tv_address;
@@ -46,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 //    TextView tv_timer;
 //    Switch sw_locationUpdates, sw_gps;
 
-    Button b_contacts, b_start, b_stop;
+    Button b_contacts, b_start, b_stop, b_permission;
 
 //    Location previous_location;
 //    float distance= 999.99f;
@@ -155,6 +159,11 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.SEND_SMS}, 2);
         }
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !Settings.canDrawOverlays(MainActivity.this)){
+            RequestPermission();
+        }
+
+
 //        txt_accel_x = findViewById(R.id.txt_accel_x);
 //        txt_accel_y = findViewById(R.id.txt_accel_y);
 //        txt_accel_z = findViewById(R.id.txt_accel_z);
@@ -187,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
         b_contacts = findViewById(R.id.b_contacts);
         b_start = findViewById(R.id.b_start);
         b_stop = findViewById(R.id.b_stop);
+        b_stop  = findViewById(R.id.b_permission);
 
 
         b_contacts.setOnClickListener(new View.OnClickListener() {
@@ -330,16 +340,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void start_service(View view){
-
         Intent myService = new Intent(MainActivity.this, AccelService.class);
         MainActivity.this.startService(myService);
     }
 
     public void stop_service(View view){
-
         Intent myService = new Intent(MainActivity.this, AccelService.class);
         MainActivity.this.stopService(myService);
-
     }
 
 
@@ -358,6 +365,39 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+    // request over
+
+    private void RequestPermission() {
+        // Check if Android M or higher
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Show alert dialog to the user saying a separate permission is needed
+            // Launch the settings activity if the user prefers
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + MainActivity.this.getPackageName()));
+            startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.canDrawOverlays(MainActivity.this)) {
+                    //
+                }
+                else
+                {
+                    // Permission Granted-System will work
+                }
+
+            }
+        }
+    }
+
 
 
 }

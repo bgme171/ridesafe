@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,9 +39,9 @@ public class AlarmActivity extends AppCompatActivity {
     TextView tv_alarm_timer, tv_location;
     Button b_cancel;
     Location location;
+    MediaPlayer mediaPlayer;
 
     CountDownTimer alarm_timer =  new CountDownTimer(30000, 1000) {
-
 
         public void onTick(long millisUntilFinished) {
             tv_alarm_timer.setText(String.valueOf((int)millisUntilFinished/1000));
@@ -48,6 +49,11 @@ public class AlarmActivity extends AppCompatActivity {
 
         public void onFinish() {
             send_sms();
+            if(mediaPlayer.isPlaying()){
+                mediaPlayer.stop();
+            }
+            mediaPlayer.release();
+            mediaPlayer=null;
         }
     };
 
@@ -126,7 +132,13 @@ public class AlarmActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
 
-        View decorView = getWindow().getDecorView();
+        // Needed to start activity even when the phone is blocked
+        final Window win= getWindow();
+        win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        win.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
+        // Needed to start activity on FullScreen
+        View decorView = win.getDecorView();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             decorView.setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -137,6 +149,11 @@ public class AlarmActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
 
+
+        mediaPlayer = MediaPlayer.create(this, R.raw.sci_alarm);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.setVolume(100,100);
+        mediaPlayer.start();
 
         tv_alarm_timer = findViewById(R.id.tv_alarm_timer);
         tv_alarm_timer.setTextSize(50);
@@ -157,8 +174,13 @@ public class AlarmActivity extends AppCompatActivity {
 
         b_cancel.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
+                if(mediaPlayer.isPlaying()){
+                    mediaPlayer.stop();
+                }
+                mediaPlayer.release();
+                mediaPlayer=null;
                 finish();
+
             }
         });
 
