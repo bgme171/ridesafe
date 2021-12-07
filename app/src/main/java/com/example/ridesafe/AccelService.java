@@ -22,7 +22,7 @@ import com.google.android.gms.location.LocationServices;
 public class AccelService extends Service {
 
     public static final int DEFAULT_UPDATE_INTERVAL = 1000;
-    public static final int FAST_UPDATE_INTERVAL = 500;
+    public static final int FAST_UPDATE_INTERVAL = 0;
 
     Location previous_location;
     float distance;
@@ -123,8 +123,7 @@ public class AccelService extends Service {
         locationRequest = LocationRequest.create()
                 .setInterval(DEFAULT_UPDATE_INTERVAL)
                 .setFastestInterval(FAST_UPDATE_INTERVAL)
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setMaxWaitTime(1000);
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         locationCallback = new LocationCallback() {
             @Override

@@ -1,6 +1,8 @@
 package com.example.ridesafe;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import android.content.Context;
 import android.content.Intent;
@@ -36,7 +38,7 @@ import java.util.Set;
 
 public class AlarmActivity extends AppCompatActivity{
 
-    TextView tv_alarm_timer, tv_location;
+    TextView tv_alarm_timer;
     Button b_cancel;
     Location location;
     MediaPlayer mediaPlayer;
@@ -61,6 +63,7 @@ public class AlarmActivity extends AppCompatActivity{
     public void send_sms(){
         SmsManager smsManager = SmsManager.getDefault();
         ArrayList<String> numbers = get_numbers();
+        ArrayList<String> names = get_names();
 
         String msg = "Hola, he sufrido un accidente mientrás conducía motocicleta\nEsta es mi ubicación: "
                       + get_adrress()
@@ -72,10 +75,16 @@ public class AlarmActivity extends AppCompatActivity{
                       +"(Enviado automáticamente por RideSafe)";
 
 
-        for (String number: numbers){
-            Toast.makeText(AlarmActivity.this, number , Toast.LENGTH_LONG).show();
+        for (int i = 0; i < numbers.size(); i++){
             ArrayList<String> parts = smsManager.divideMessage(msg);
-            smsManager.sendMultipartTextMessage(number.replace("+",""), null, parts, null, null);
+            smsManager.sendMultipartTextMessage(numbers.get(i).replace("+",""), null, parts, null, null);
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(AlarmActivity.this, "256")
+                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+                    .setContentTitle("SMS enviado a " + names.get(i))
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(AlarmActivity.this);
+            notificationManager.notify(666, builder.build());
         }
 
     } //end send_sms
@@ -105,6 +114,20 @@ public class AlarmActivity extends AppCompatActivity{
 
         return numbers;
     } //end get_numbers
+
+    public ArrayList<String> get_names(){
+        SharedPreferences preferences = getSharedPreferences("contacts", Context.MODE_PRIVATE);
+        Set<String> contact_list = preferences.getStringSet("contact_list", new HashSet<String>());
+
+        ArrayList<String> names = new ArrayList<String>();
+
+        for(String tmp : contact_list){
+            String[] data = get_data_from_uri(Uri.parse(tmp));
+            names.add(data[0]);
+        }
+
+        return names;
+    } //end get_names
 
 
     private String[] get_data_from_uri(Uri uri){
@@ -153,10 +176,9 @@ public class AlarmActivity extends AppCompatActivity{
         mediaPlayer.start();
 
         tv_alarm_timer = findViewById(R.id.tv_alarm_timer);
-        tv_alarm_timer.setTextSize(50);
-        tv_alarm_timer.setTextColor(Color.RED);
+        //tv_alarm_timer.setTextSize(50);
+        //tv_alarm_timer.setTextColor(Color.RED);
 
-        tv_location = findViewById(R.id.tv_location);
         b_cancel=findViewById(R.id.b_cancel);
 
         Bundle extras = getIntent().getExtras();
@@ -179,10 +201,11 @@ public class AlarmActivity extends AppCompatActivity{
                 Intent myService =  new Intent(getApplicationContext(), AccelService.class);
                 startService(myService);
 
+                alarm_timer.cancel();
                 finish();
 
             }
         });
-        
+
     }
 }

@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSIONS_FINE_LOCATION = 1;
     private static final int PERMISSIONS_SEND_SMS = 2;
+    private static final int PERMISSIONS_BACKGROUND_LOCATION = 3;
     public static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE= 2323;
     Button b_contacts, b_start, b_stop, b_permission;
 
@@ -53,6 +54,12 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},PERMISSIONS_FINE_LOCATION);
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                requestPermissions(new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION},PERMISSIONS_BACKGROUND_LOCATION);
             }
         }
 
@@ -109,6 +116,12 @@ public class MainActivity extends AppCompatActivity {
             case PERMISSIONS_SEND_SMS:
                 if (grantResults[0] != PackageManager.PERMISSION_GRANTED){
                     Toast.makeText(this, "RiseSafe necesita permisos para  enviar SMS", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                break;
+            case PERMISSIONS_BACKGROUND_LOCATION:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this, "RiseSafe necesita permisos para acceder unbicación en 2do plano", Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 break;
