@@ -8,7 +8,9 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -35,7 +37,9 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -120,6 +124,22 @@ public class MainActivity extends AppCompatActivity {
     } //end onPause
 
     public void start_service(View view){
+
+        SharedPreferences preferences = getSharedPreferences("contacts", Context.MODE_PRIVATE);
+        Set<String> contact_list = preferences.getStringSet("contact_list", new HashSet<String>());
+
+        if(contact_list.isEmpty()){
+            Toast.makeText(this, "RiseSafe no puede iniciar sin contactos de emergencia", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(MainActivity.this)) {
+                Toast.makeText(this, "RiseSafe no puede iniciar sin permisos de sobreposición", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
         b_start.setEnabled(false);
         b_stop.setEnabled(true);
         Intent myService = new Intent(getApplicationContext(), AccelService.class);
@@ -174,8 +194,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (!Settings.canDrawOverlays(MainActivity.this)) {
-                    Toast.makeText(this, "RideSafe necesita permisos de sobreposición", Toast.LENGTH_SHORT).show();
-                    finish();
+                    Toast.makeText(this, "RiseSafe no puede iniciar sin permisos de sobreposición", Toast.LENGTH_SHORT).show();
                 }
             }
         }

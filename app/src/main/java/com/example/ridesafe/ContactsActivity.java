@@ -54,24 +54,24 @@ public class ContactsActivity extends AppCompatActivity {
 
         list_view_refresh();
         lv_contacts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-               @Override
-               public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                   new AlertDialog.Builder(ContactsActivity.this)
-                        .setTitle("Eliminar contacto")
-                        .setMessage("El contacto será eliminado de tu lista de emergencias")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                    delete(position);
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                                               @Override
+                                               public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                                   new AlertDialog.Builder(ContactsActivity.this)
+                                                           .setTitle("Eliminar contacto")
+                                                           .setMessage("El contacto será eliminado de tu lista de emergencias")
+                                                           .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                                               @Override
+                                                               public void onClick(DialogInterface dialog, int which) {
+                                                                   delete(position);
+                                                               }
+                                                           })
+                                                           .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                                               @Override
+                                                               public void onClick(DialogInterface dialog, int which) {
 
-                            }
-                        })
-                        .show();
+                                                               }
+                                                           })
+                                                           .show();
                                                }
 
 
@@ -79,7 +79,7 @@ public class ContactsActivity extends AppCompatActivity {
         );
 
 
-                b_save = findViewById(R.id.b_guardar);
+        b_save = findViewById(R.id.b_guardar);
 
 
 

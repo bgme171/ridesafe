@@ -22,8 +22,8 @@ import com.google.android.gms.location.LocationServices;
 
 public class AccelService extends Service {
 
-    public static final int DEFAULT_UPDATE_INTERVAL = 1000;
-    public static final int FAST_UPDATE_INTERVAL = 0;
+    public static final int DEFAULT_UPDATE_INTERVAL = 2000;
+    public static final int FAST_UPDATE_INTERVAL = 1000;
 
     Location previous_location;
     float distance;
