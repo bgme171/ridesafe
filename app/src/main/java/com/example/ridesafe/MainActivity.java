@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -71,6 +72,14 @@ public class MainActivity extends AppCompatActivity {
         b_stop = findViewById(R.id.b_stop);
         b_permission  = findViewById(R.id.b_permission);
 
+
+        if(isMyServiceRunning(AccelService.class)){
+            b_start.setEnabled(false);
+            b_stop.setEnabled(true);
+        }else{
+            b_start.setEnabled(true);
+            b_stop.setEnabled(false);
+        }
 
         b_contacts.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -199,6 +208,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     } //end onActivityResult
+
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 }
